@@ -13,6 +13,8 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as path;
 
+import 'modules.dart';
+
 class audplayer extends StatefulWidget {
   
   audplayer({super.key, });
@@ -134,54 +136,53 @@ TextEditingController srcplaylisturl =TextEditingController();
 
 
 
-void playlistviddownload(playlisturl)async{
- var videoTitle='';
-var yt = YoutubeExplode();
-int count =0;
-var file=File('');
-// Get playlist metadata.
-var playlist = await yt.playlists.get(playlisturl);
+// void playlistviddownload(playlisturl)async{
+//  var videoTitle='';
+// var yt = YoutubeExplode();
+// int count =0;
+// var file=File('');
+// // Get playlist metadata.
+// var playlist = await yt.playlists.get(playlisturl);
 
-var title = playlist.title;
-var author = playlist.author;
+// var title = playlist.title;
+// var author = playlist.author;
 
-  Fluttertoast.showToast(
-        msg: 'you audio downloading please wait',
-        toastLength: Toast.LENGTH_LONG,
-        backgroundColor: const Color.fromARGB(255, 109, 96, 169),
-        textColor: const Color.fromARGB(255, 15, 0, 0),
-        gravity: ToastGravity.CENTER,
-        fontSize: 20.0,
-      );
-  await for (var video in yt.playlists.getVideos(playlist.id)) {
-   videoTitle = video.title;
-    var videoAuthor = video.author;
-
-
+//   Fluttertoast.showToast(
+//         msg: 'you audio downloading please wait',
+//         toastLength: Toast.LENGTH_LONG,
+//         backgroundColor: const Color.fromARGB(255, 109, 96, 169),
+//         textColor: const Color.fromARGB(255, 15, 0, 0),
+//         gravity: ToastGravity.CENTER,
+//         fontSize: 20.0,
+//       );
+//   await for (var video in yt.playlists.getVideos(playlist.id)) {
+//    videoTitle = video.title;
+//     var videoAuthor = video.author;
 
 
-final streamManifest = await yt.videos.streamsClient.getManifest(video.id);
 
-final streamInfo = streamManifest.muxed.bestQuality;
 
-// if (streamInfo != null) {
-  // Get the actual stream
-  var stream = yt.videos.streamsClient.get(streamInfo);
+// final streamManifest = await yt.videos.streamsClient.getManifest(video.id);
+
+// // final streamInfo = streamManifest.muxed.bestQuality;
+// final streamInfo =streamManifest.audio.withHighestBitrate();
+
+// // if (streamInfo != null) {
+//   // Get the actual stream
+//   var stream = yt.videos.streamsClient.get(streamInfo);
   
-final permissionStatus = await Permission.storage.status;
-if(permissionStatus.isDenied){
+// final permissionStatus = await Permission.storage.status;
+// if(permissionStatus.isDenied){
 
-// final status = await Permission.manageExternalStorage.request();
-final status = await Permission.storage.request();
-    setState(() {
-      hasPermission = status.isGranted;
-    });
-}    
-else{
-  hasPermission=permissionStatus.isGranted;
-}
-
-
+// // final status = await Permission.manageExternalStorage.request();
+// final status = await Permission.storage.request();
+//     setState(() {
+//       hasPermission = status.isGranted;
+//     });
+// }    
+// else{
+//   hasPermission=permissionStatus.isGranted;
+// }
 
 
 
@@ -193,87 +194,89 @@ else{
 
 
 
- if (await Permission.storage.request().isGranted) {
-      // Either the permission was already granted before or the user just granted it.
+
+
+//  if (await Permission.storage.request().isGranted) {
+//       // Either the permission was already granted before or the user just granted it.
 
       
 
 
-      // Directory? dir = await getExternalStorageDirectory();
+//       // Directory? dir = await getExternalStorageDirectory();
 
-  Directory filedir = Directory('/storage/emulated/0/Movies/ptstube');
-        if (!(await filedir.exists())) {
-          await filedir.create(recursive: true);
-          print('Directory created at $filedir');
-        } else {
-          print('Directory already exists at $filedir');
-        }
-
-
+//   Directory filedir = Directory('/storage/emulated/0/ptstube');
+//         if (!(await filedir.exists())) {
+//           await filedir.create(recursive: true);
+//           print('Directory created at $filedir');
+//         } else {
+//           print('Directory already exists at $filedir');
+//         }
 
 
 
 
 
 
-  // Open a file for writing.
-try {
-   file = File(path.join('${filedir.path}','${video.title.toString()}.mp4'));
- await file.create();
-} catch (e) {
 
-    file = File(path.join('${filedir.path}','${video.id.toString()}.mp4'));
- await file.create();
+
+//   // Open a file for writing.
+// try {
+//    file = File(path.join('${filedir.path}','${video.title.toString()}.mp3'));
+//  await file.create();
+// } catch (e) {
+
+//     file = File(path.join('${filedir.path}','${video.id.toString()}.mp3'));
+//  await file.create();
   
-}
+// }
  
 
-    Fluttertoast.showToast(
-        msg: '$file started',
-        toastLength: Toast.LENGTH_LONG,
-        backgroundColor: const Color.fromARGB(255, 109, 96, 169),
-        textColor: const Color.fromARGB(255, 15, 0, 0),
-        gravity: ToastGravity.CENTER,
-        fontSize: 20.0,
-      );
-  var fileStream = file.openWrite();
+//     Fluttertoast.showToast(
+//         msg: '$file started',
+//         toastLength: Toast.LENGTH_LONG,
+//         backgroundColor: const Color.fromARGB(255, 109, 96, 169),
+//         textColor: const Color.fromARGB(255, 15, 0, 0),
+//         gravity: ToastGravity.CENTER,
+//         fontSize: 20.0,
+//       );
+//   var fileStream = file.openWrite();
 
-  // Pipe all the content of the stream into the file.
-  await stream.pipe(fileStream);
+//   // Pipe all the content of the stream into the file.
+//   await stream.pipe(fileStream);
 
-      Fluttertoast.showToast(
-        msg: '$file downloded',
-        toastLength: Toast.LENGTH_LONG,
-        backgroundColor: const Color.fromARGB(255, 109, 96, 169),
-        textColor: const Color.fromARGB(255, 15, 0, 0),
-        gravity: ToastGravity.CENTER,
-        fontSize: 20.0,
-      );
-      count=count+1;
-  // Close the file.
-  await fileStream.flush();
-  await fileStream.close();
+//       Fluttertoast.showToast(
+//         msg: '$file downloded',
+//         toastLength: Toast.LENGTH_LONG,
+//         backgroundColor: const Color.fromARGB(255, 109, 96, 169),
+//         textColor: const Color.fromARGB(255, 15, 0, 0),
+//         gravity: ToastGravity.CENTER,
+//         fontSize: 20.0,
+//       );
+//       count=count+1;
+//   // Close the file.
+//   await fileStream.flush();
+//   await fileStream.close();
   
 
- }
- if(count==yt.playlists.getVideos(playlist.id).length){
-     Fluttertoast.showToast(
-        msg: 'all files are  downloded',
-        toastLength: Toast.LENGTH_LONG,
-        backgroundColor: const Color.fromARGB(255, 109, 96, 169),
-        textColor: const Color.fromARGB(255, 15, 0, 0),
-        gravity: ToastGravity.CENTER,
-        fontSize: 20.0,
-      );
-  }
-  }
+//  }
+//  if(count==yt.playlists.getVideos(playlist.id).length){
+//      Fluttertoast.showToast(
+//         msg: 'all files are  downloded',
+//         toastLength: Toast.LENGTH_LONG,
+//         backgroundColor: const Color.fromARGB(255, 109, 96, 169),
+//         textColor: const Color.fromARGB(255, 15, 0, 0),
+//         gravity: ToastGravity.CENTER,
+//         fontSize: 20.0,
+//       );
+//   }
+//   }
 
-// var playlistVideos = await yt.playlists.getVideos(playlist.id);
+// // var playlistVideos = await yt.playlists.getVideos(playlist.id);
 
-// Get first 20 playlist videos.
-// var somePlaylistVideos = await yt.playlists.getVideos(playlist.id).take(20);
+// // Get first 20 playlist videos.
+// // var somePlaylistVideos = await yt.playlists.getVideos(playlist.id).take(20);
 
-}
+// }
 
 
 
@@ -403,7 +406,7 @@ try {
                 ),
               ),
               ElevatedButton(onPressed: (){
-playlistviddownload(srcplaylisturl);
+playlistviddownload(srcplaylisturl,PlaylistContentType.audio,'mp3','Music');
               }, child: Text('Download'))
             ],
           ),

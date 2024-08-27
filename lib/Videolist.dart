@@ -4,10 +4,12 @@ import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 
 class VideoListScreen extends StatefulWidget {
   final List<Video> videos;
+  final String playlistname;
 
   const VideoListScreen({
     Key? key,
     required this.videos,
+    required this.playlistname,
   }) : super(key: key);
 
   @override
@@ -21,6 +23,9 @@ class _VideoListScreenState extends State<VideoListScreen> {
   late List<bool> isPlayingList;
   Duration _duration = Duration.zero;
   Duration _position = Duration.zero;
+  late List<Duration>positionlist;
+  ScrollController _scrollController = ScrollController();
+  
 
   final yt = YoutubeExplode();
 
@@ -29,7 +34,7 @@ class _VideoListScreenState extends State<VideoListScreen> {
     super.initState();
     _player = AudioPlayer();
     isPlayingList = List.generate(widget.videos.length, (index) => false);
-
+    positionlist = List.generate(widget.videos.length, (index) => Duration.zero);
 
   
   }
@@ -78,6 +83,7 @@ class _VideoListScreenState extends State<VideoListScreen> {
 
       setState(() {
         _position = position;
+        positionlist[currentIndex]=position;
         print(position);
       });
     });
@@ -106,7 +112,8 @@ class _VideoListScreenState extends State<VideoListScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Videos'),
+        title: Text(widget.playlistname,),
+        centerTitle: true,
       ),
       body: Center(
         
@@ -115,99 +122,111 @@ class _VideoListScreenState extends State<VideoListScreen> {
 
           children: [
             
-            SizedBox(
-              width:  MediaQuery.sizeOf(context).width * 0.91,
-              child: ListView.builder(
-                // padding: const EdgeInsetsDirectional.symmetric(vertical: 2),
-                shrinkWrap: true,
-                scrollDirection: Axis.vertical,
-                itemCount: widget.videos.length,
-                itemBuilder: (context, index) {
-                  return Card(
-                    color: Colors.deepPurple[200],
-                    child: InkWell(
-                        borderRadius: BorderRadius.vertical(
-                            top: Radius.circular(50.0), bottom: Radius.circular(50.0)),
-                        splashColor: Colors.pink,
-                        child: Column(
-                          children: [
-                            SingleChildScrollView(
-                              scrollDirection: Axis.horizontal,
-                              child: Text(widget.videos[index].title,style: TextStyle(fontSize: 16.0)),
+            SingleChildScrollView(
+              child: SizedBox(
+                width:  MediaQuery.sizeOf(context).width * 0.91,
+                height: MediaQuery.sizeOf(context).height*0.87,
+                child: ListView.builder(
+                  // padding: const EdgeInsetsDirectional.symmetric(vertical: 2),
+                  controller: _scrollController,
+                  shrinkWrap: true,
+                  scrollDirection: Axis.vertical,
+                  itemCount: widget.videos.length,
+                  itemBuilder: (context, index) {
+                    return Card(
+                      color: Colors.deepPurple[200],
+                      child: InkWell(
+                          borderRadius: BorderRadius.vertical(
+                              top: Radius.circular(50.0), bottom: Radius.circular(50.0)),
+                          splashColor: Colors.pink,
+                          child: Column(
+                            children: [
+                              SingleChildScrollView(
+                                scrollDirection: Axis.horizontal,
+                                child: Text(widget.videos[index].title,style: TextStyle(fontSize: 16.0)),
+                              ),
+                              Row(
+                                children: [
+                                   Padding(
+                              padding: const EdgeInsets.all(16.0),
+                              child: Text(
+                                ("${widget.videos[index].duration}"),
+                                style: TextStyle(fontSize: 16.0),
+                              ),
                             ),
-                            Row(
-                              children: [
-                                 Padding(
-                            padding: const EdgeInsets.all(16.0),
-                            child: Text(
-                              ("${widget.videos[index].duration}"),
-                              style: TextStyle(fontSize: 16.0),
+                            //   Padding(
+                            //   padding: const EdgeInsets.all(16.0),
+                            //   child: Text(
+                            //     _position.toString().substring(0, 7),
+                            //     style: TextStyle(fontSize: 16.0),
+                            //   ),
+                            // ),
+              
+                              Padding(
+                              padding: const EdgeInsets.all(16.0),
+                              child: Text(
+                                positionlist[index].toString().substring(0, 7),
+                                style: TextStyle(fontSize: 16.0),
+                              ),
                             ),
-                          ),
-                            Padding(
-                            padding: const EdgeInsets.all(16.0),
-                            child: Text(
-                              _position.toString().substring(0, 7),
-                              style: TextStyle(fontSize: 16.0),
-                            ),
-                          ),
-                              ],
-                            ),
-                            Row(
-                              children: [
-                                SizedBox(
-                                  width:  MediaQuery.sizeOf(context).width * 0.07,
-                                ),
-                                IconButton(
-                                  icon: Icon(Icons.replay_30_sharp),
-                  
-                                  onPressed: () {
-                                    _player.seek(_position - Duration(seconds: 30));
-                                  },
-                                ),
-                                IconButton(
-                                  icon: Icon(Icons.replay_10),
-                                  onPressed: () {
-                                    _player.seek(_position - Duration(seconds: 10));
-                                  },
-                                ),
-                                IconButton(
-                                  icon: Icon(isPlayingList[index]
-                                      ? Icons.pause
-                                      : Icons.play_arrow),
-                                  onPressed: () {
-                                    // Play the video
-                                    // audioplay(widget.videos);
-                                    if (isPlayingList[index]) {
-                                      _player.pause();
-                                    } else {
-                                      audioplay(widget.videos[index].id);
-                                    }
-                                    setState(() {
-                                      isPlayingList[index] = !isPlayingList[index];
-                                    });
-                                  },
-                                ),
-                              
-                                IconButton(
-                                  icon: Icon(Icons.forward_10_rounded),
-                                  onPressed: () {
-                                    _player.seek(_position + Duration(seconds: 10));
-                                  },
-                                ),
+                                ],
+                              ),
+                              Row(
+                                children: [
+                                  SizedBox(
+                                    width:  MediaQuery.sizeOf(context).width * 0.07,
+                                  ),
                                   IconButton(
-                                  icon: Icon(Icons.forward_30_rounded),
-                                  onPressed: () {
-                                    _player.seek(_position + Duration(seconds: 30));
-                                  },
-                                ),
-                              ],
-                            )
-                          ],
+                                    icon: Icon(Icons.replay_30_sharp),
+                    
+                                    onPressed: () {
+                                      _player.seek(_position - Duration(seconds: 30));
+                                    },
+                                  ),
+                                  IconButton(
+                                    icon: Icon(Icons.replay_10),
+                                    onPressed: () {
+                                      _player.seek(_position - Duration(seconds: 10));
+                                    },
+                                  ),
+                                  IconButton(
+                                    icon: Icon(isPlayingList[index]
+                                        ? Icons.pause
+                                        : Icons.play_arrow),
+                                    onPressed: () {
+                                      // Play the video
+                                      // audioplay(widget.videos);
+                                      if (isPlayingList[index]) {
+                                        _player.pause();
+                                      } else {
+                                        audioplay(widget.videos[index].id);
+                                      }
+                                      setState(() {
+                                        isPlayingList[index] = !isPlayingList[index];
+                                      });
+                                    },
+                                  ),
+                                
+                                  IconButton(
+                                    icon: Icon(Icons.forward_10_rounded),
+                                    onPressed: () {
+                                      _player.seek(_position + Duration(seconds: 10));
+                                    },
+                                  ),
+                                    IconButton(
+                                    icon: Icon(Icons.forward_30_rounded),
+                                    onPressed: () {
+                                      _player.seek(_position + Duration(seconds: 30));
+                                    },
+                                  ),
+                                ],
+                              )
+                            ],
+                          ),
                         ),
-                      ),
-                  );
-                },
+                    );
+                  },
+                ),
               ),
             ),
           ],
